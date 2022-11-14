@@ -40,7 +40,7 @@ import sys
 import json
 
 info = json.loads(sys.argv[1]) # { name: "hlm", hobby: "coding" }
-print(info) # send result back to js
+print(json.dumps(info)) # send result back to js
 ```
 
 ```js
