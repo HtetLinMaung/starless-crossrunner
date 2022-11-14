@@ -20,7 +20,7 @@ const { invokePython } = require("starless-crossrunner");
 invokePython("main.py", "Hello to python");
 ```
 
-## Passing Message To Python
+## Sending Message To Python
 
 ```js
 invokePython("main.py", { name: "hlm", hobby: "coding" });
