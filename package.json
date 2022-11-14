@@ -1,0 +1,21 @@
+{
+  "name": "starless-crossrunner",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc && node test",
+    "build": "tsc",
+    "release": "tsc && npm publish"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "code-alchemy": "^1.1.10"
+  }
+}
