@@ -47,3 +47,28 @@ print(info) # send result back to js
 const result = await invokePython("main.py", { name: "hlm", hobby: "coding" });
 console.log(result); // { name: "hlm", hobby: "coding" }
 ```
+
+## Running with Venv
+
+```js
+invokePython("main.py", "Hello to python", {
+  venvPath: "...", // path to venv folder
+});
+```
+
+## Running with Conda
+
+```js
+invokePython("main.py", "Hello to python", {
+  venvPath: "...", // conda env
+  isConda: true,
+});
+```
+
+## Custom Python Path
+
+```js
+invokePython("main.py", "Hello to python", {
+  pythonPath: "...",
+});
+```
