@@ -23,13 +23,24 @@ export const invokePython = async (
     typeof message == "string" ? message : JSON.stringify(message)
   }`;
   if (defaultOptions.venvPath) {
-    cmd = `source ${path.join(
-      defaultOptions.venvPath,
-      "bin",
-      "activate"
-    )} && ${cmd} && ${
-      defaultOptions.isConda ? "conda deactivate" : "deactivate"
-    }`;
+    if (process.platform == "win32") {
+      cmd = ` ${path.join(
+        ".",
+        defaultOptions.venvPath,
+        "Scripts",
+        "Activate"
+      )} && ${cmd} && ${
+        defaultOptions.isConda ? "conda deactivate" : "deactivate"
+      }`;
+    } else {
+      cmd = `source ${path.join(
+        defaultOptions.venvPath,
+        "bin",
+        "activate"
+      )} && ${cmd} && ${
+        defaultOptions.isConda ? "conda deactivate" : "deactivate"
+      }`;
+    }
   }
 
   const { stdout, stderr } = await exec(cmd);

@@ -19,7 +19,12 @@ const invokePython = (scriptPath, message = {}, options) => __awaiter(void 0, vo
     const defaultOptions = Object.assign({ venvPath: "", pythonPath: "", isConda: false }, options);
     let cmd = `${defaultOptions.pythonPath || "python"} ${scriptPath} ${typeof message == "string" ? message : JSON.stringify(message)}`;
     if (defaultOptions.venvPath) {
-        cmd = `source ${node_path_1.default.join(defaultOptions.venvPath, "bin", "activate")} && ${cmd} && ${defaultOptions.isConda ? "conda deactivate" : "deactivate"}`;
+        if (process.platform == "win32") {
+            cmd = ` ${node_path_1.default.join(".", defaultOptions.venvPath, "Scripts", "Activate")} && ${cmd} && ${defaultOptions.isConda ? "conda deactivate" : "deactivate"}`;
+        }
+        else {
+            cmd = `source ${node_path_1.default.join(defaultOptions.venvPath, "bin", "activate")} && ${cmd} && ${defaultOptions.isConda ? "conda deactivate" : "deactivate"}`;
+        }
     }
     const { stdout, stderr } = yield (0, child_process_1.exec)(cmd);
     if (stderr) {
