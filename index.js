@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.invokePython = void 0;
+exports.invokeRust = exports.invokePython = void 0;
 const child_process_1 = require("code-alchemy/child_process");
 const node_path_1 = __importDefault(require("node:path"));
+const node_fs_1 = __importDefault(require("node:fs"));
 const invokePython = (scriptPath, message = {}, options) => __awaiter(void 0, void 0, void 0, function* () {
     const defaultOptions = Object.assign({ venvPath: "", pythonPath: "", isConda: false }, options);
     let cmd = `${defaultOptions.pythonPath || "python"} ${scriptPath} ${typeof message == "string" ? message : JSON.stringify(message)}`;
@@ -30,11 +31,66 @@ const invokePython = (scriptPath, message = {}, options) => __awaiter(void 0, vo
     if (stderr) {
         throw new Error(stderr);
     }
-    try {
-        return JSON.parse(stdout);
+    const stdouts = stdout.includes("\n")
+        ? stdout.split("\n").filter((s) => s)
+        : [stdout];
+    if (stdouts.length > 1) {
+        return stdouts.map((stdout) => {
+            try {
+                return JSON.parse(stdout);
+            }
+            catch (err) {
+                return stdout;
+            }
+        });
     }
-    catch (err) {
-        return stdout;
+    else {
+        try {
+            return JSON.parse(stdouts[0]);
+        }
+        catch (err) {
+            return stdout;
+        }
     }
 });
 exports.invokePython = invokePython;
+const invokeRust = (scriptOrFolderPath, message = {}) => __awaiter(void 0, void 0, void 0, function* () {
+    let cmd = "";
+    if (node_fs_1.default.statSync(scriptOrFolderPath).isDirectory()) {
+        cmd = `cargo run --release ${typeof message == "string"
+            ? " -- " + message
+            : " -- " + JSON.stringify(message)}`;
+    }
+    else {
+        cmd = `rustc ${scriptOrFolderPath} && ${process.platform == "win32" ? ".\\" : "./"}${node_path_1.default
+            .basename(scriptOrFolderPath)
+            .replace(node_path_1.default.extname(scriptOrFolderPath), "")} ${typeof message == "string" ? message : JSON.stringify(message)}`;
+    }
+    const { stdout, stderr } = yield (0, child_process_1.exec)(cmd, {
+        cwd: node_fs_1.default.statSync(scriptOrFolderPath).isDirectory()
+            ? scriptOrFolderPath
+            : process.cwd(),
+    });
+    const stdouts = stdout.includes("\n")
+        ? stdout.split("\n").filter((s) => s)
+        : [stdout];
+    if (stdouts.length > 1) {
+        return stdouts.map((stdout) => {
+            try {
+                return JSON.parse(stdout);
+            }
+            catch (err) {
+                return stdout;
+            }
+        });
+    }
+    else {
+        try {
+            return JSON.parse(stdouts[0]);
+        }
+        catch (err) {
+            return stdout;
+        }
+    }
+});
+exports.invokeRust = invokeRust;
